@@ -29,6 +29,7 @@ package candykind
 
 import (
 	"context"
+	"embed"
 	"encoding/json"
 	"fmt"
 
@@ -37,6 +38,9 @@ import (
 	"github.com/opencharly/spec/spec"
 )
 
+//go:embed schema/*.cue
+var schemaFS embed.FS
+
 const calver = "2026.182.1600"
 
 // NewProvider returns the candy kind provider for in-proc registration or out-of-proc serving.
@@ -44,14 +48,15 @@ func NewProvider() pb.ProviderServer { return &provider{} }
 
 // NewMeta ships the candy kind capability (Class "kind", word "candy", InputDef:"" — the rich
 // box⊻layer value is validated HOST-SIDE against the KEPT #CandyValue core def, NOT by this
-// served schema; the self-contained #CandyKindLoad def exists only to satisfy the
-// non-empty-schema load gate), via sdk.NewMeta → BuildCapabilities. Structural is deliberately
-// omitted (FALSE): `candy` nests NO deploy resource members and is routed to foldCandyKind by an
-// explicit `gn.disc=="candy"` host branch, NOT via the structural fold.
+// served schema; this plugin's OWN self-contained CUE schema — schema/candykind.cue, defining
+// #CandyKindPlugin and embedded via schemaFS — documents the kind's surface and satisfies the
+// non-empty-schema contract: there is NO schema-less plugin), via sdk.NewMeta → BuildCapabilities.
+// Structural is deliberately omitted (FALSE): `candy` nests NO deploy resource members and is
+// routed to foldCandyKind by an explicit `gn.disc=="candy"` host branch, NOT via the structural fold.
 func NewMeta() pb.PluginMetaServer {
 	return sdk.NewMeta(calver,
 		[]sdk.ProvidedCapability{{Class: "kind", Word: "candy"}},
-		nil)
+		schemaFS)
 }
 
 type provider struct{ pb.UnimplementedProviderServer }
