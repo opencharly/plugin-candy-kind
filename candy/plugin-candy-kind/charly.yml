@@ -1,7 +1,5 @@
-version: 2026.232.0520
 plugin-candy-kind:
     candy:
-        version: 2026.182.1600
         description: |-
             The `candy` box⊻layer factory KIND — the LAST structural kind — relocated into a candy
             (C2-candy; formerly the built-in candyKind in charly/plugin_candy.go). A `candy:` node is
