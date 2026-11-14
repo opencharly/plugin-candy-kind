@@ -81,25 +81,14 @@ func (provider) Invoke(_ context.Context, req *pb.InvokeRequest) (*pb.InvokeRepl
 	if env.Standalone == nil {
 		return nil, fmt.Errorf("candy kind: host threaded no pre-decoded node (op.Env.standalone missing)")
 	}
+	// The wire carries the canonical node as OPAQUE BYTES (D-SCH-7), so this arm echoes
+	// the body verbatim and the shape only selects which node the host decoded.
 	switch env.Standalone.Shape {
-	case "candy-image":
-		if env.Standalone.Box == nil {
-			return nil, fmt.Errorf("candy kind: candy-image shape carries no box node")
+	case "candy-image", "candy-layer":
+		if len(env.Standalone.Body) == 0 {
+			return nil, fmt.Errorf("candy kind: %s shape carries no body", env.Standalone.Shape)
 		}
-		out, err := json.Marshal(env.Standalone.Box)
-		if err != nil {
-			return nil, fmt.Errorf("candy kind: marshal box: %w", err)
-		}
-		return &pb.InvokeReply{ResultJson: out}, nil
-	case "candy-layer":
-		if env.Standalone.Candy == nil {
-			return nil, fmt.Errorf("candy kind: candy-layer shape carries no candy node")
-		}
-		out, err := json.Marshal(env.Standalone.Candy)
-		if err != nil {
-			return nil, fmt.Errorf("candy kind: marshal candy: %w", err)
-		}
-		return &pb.InvokeReply{ResultJson: out}, nil
+		return &pb.InvokeReply{ResultJson: env.Standalone.Body}, nil
 	default:
 		return nil, fmt.Errorf("candy kind: unknown load shape %q (want candy-image|candy-layer)", env.Standalone.Shape)
 	}
