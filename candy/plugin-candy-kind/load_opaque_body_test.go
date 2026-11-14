@@ -22,8 +22,8 @@ func envJSON(t *testing.T, env *spec.StructuralKindLoadEnv) []byte {
 
 // TestInvokeEchoesTheOpaqueBody pins the cutover behaviour (opencharly/spec#322):
 // every candy shape rides ONE bytes carrier and the plugin echoes it verbatim. It
-// fails to compile against the pre-cutover envelope, whose typed Box/Candy arms are
-// gone, and it fails at run time if the arm stops echoing.
+// fails to compile against the PRE-cutover envelope — the one carrying the typed
+// Box/Candy arms and no Body field — and it fails at run time if the arm stops echoing.
 func TestInvokeEchoesTheOpaqueBody(t *testing.T) {
 	for _, shape := range []string{"candy-image", "candy-layer"} {
 		body := []byte(`{"name":"demo","kind":"candy"}`)
