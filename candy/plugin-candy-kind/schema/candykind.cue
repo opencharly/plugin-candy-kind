@@ -25,3 +25,30 @@
 	// What the plugin does, in one line (the public-docs surface).
 	contract: string & !=""
 }
+
+// -----------------------------------------------------------------------------
+// The AUTHORED candy body sub-shapes this plugin OWNS.
+//
+// DESIGN.md 3.1 assigns the candy body to the plugin that serves `kind: candy` — this one.
+// Until now these shapes lived in `spec`'s schema because they wore two hats at once: the
+// AUTHORED shape a user writes under `candy:` (3.1, the plugin's) and the WIRE shape a
+// consumer decodes an opaque body into (10.2, spec's). That collision is gone: spec keeps
+// the RESOLVED twins (#ResolvedCandyAlias / #ResolvedCandyVolume, spec#337) as its decode
+// targets, so the authored shapes can live here, where the body lives.
+//
+// These are the FIRST authored candy defs to make the move. The rest of #Candy follows.
+// -----------------------------------------------------------------------------
+
+// #CandyAlias — one entry of a candy's `alias:` list. `command` is REQUIRED for a CANDY
+// alias (validateAliases); the box-level #BoxAlias keeps it optional (defaults to name).
+#CandyAlias: {
+	name:    string & !=""
+	command: string & !=""
+}
+
+// #CandyVolume — one entry of a candy's `volume:` list. name is lowercase-hyphen
+// (validateVolume); path may be home-relative (~/…) or absolute, so not anchored to /.
+#CandyVolume: {
+	name: string & =~"^[a-z0-9]+(-[a-z0-9]+)*$"
+	path: string & !=""
+}
